@@ -121,10 +121,7 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
       return;
     }
 
-    _connection?.setEditableSizeAndTransform(
-      rect.size,
-      Matrix4.translationValues(0, 0, 0),
-    );
+    _connection?.setEditableSizeAndTransform(rect.size, Matrix4.translationValues(0, 0, 0));
 
     _connection?.setCaretRect(caretRect);
   }
@@ -159,7 +156,12 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
     if (hasInputConnection) {
       _connection!.show();
     } else {
+      final int? viewId = View.maybeOf(context)?.viewId;
+      if (viewId == null) {
+        throw Exception('Cannot open input connection without a valid viewId.');
+      }
       final config = TextInputConfiguration(
+        viewId: viewId,
         inputType: widget.inputType,
         inputAction: widget.inputAction,
         keyboardAppearance: widget.keyboardAppearance,
@@ -186,14 +188,8 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
   }
 
   TextEditingValue get _initEditingState => widget.deleteDetection
-      ? const TextEditingValue(
-          text: '  ',
-          selection: TextSelection.collapsed(offset: 2),
-        )
-      : const TextEditingValue(
-          text: '',
-          selection: TextSelection.collapsed(offset: 0),
-        );
+      ? const TextEditingValue(text: '  ', selection: TextSelection.collapsed(offset: 2))
+      : const TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
 
   late var _currentEditingState = _initEditingState.copyWith();
 
@@ -224,9 +220,7 @@ class CustomTextEditState extends State<CustomTextEdit> with TextInputClient {
     if (_currentEditingState.text.length < _initEditingState.text.length) {
       widget.onDelete();
     } else {
-      final textDelta = _currentEditingState.text.substring(
-        _initEditingState.text.length,
-      );
+      final textDelta = _currentEditingState.text.substring(_initEditingState.text.length);
 
       widget.onInsert(textDelta);
     }
