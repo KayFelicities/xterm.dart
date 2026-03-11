@@ -217,6 +217,9 @@ class TerminalViewState extends State<TerminalView> {
   @override
   Widget build(BuildContext context) {
     Widget child = Scrollable(
+      physics: AlwaysScrollableScrollPhysics(
+        parent: ClampingScrollPhysics(),
+      ),
       key: _scrollableKey,
       controller: _scrollController,
       viewportBuilder: (context, offset) {
@@ -225,7 +228,6 @@ class TerminalViewState extends State<TerminalView> {
           terminal: widget.terminal,
           controller: _controller,
           offset: offset,
-          padding: MediaQuery.of(context).padding,
           autoResize: widget.autoResize,
           textStyle: widget.textStyle,
           textScaler: widget.textScaler ?? MediaQuery.textScalerOf(context),
@@ -452,7 +454,6 @@ class _TerminalView extends LeafRenderObjectWidget {
     required this.terminal,
     required this.controller,
     required this.offset,
-    required this.padding,
     required this.autoResize,
     required this.textStyle,
     required this.textScaler,
@@ -469,8 +470,6 @@ class _TerminalView extends LeafRenderObjectWidget {
   final TerminalController controller;
 
   final ViewportOffset offset;
-
-  final EdgeInsets padding;
 
   final bool autoResize;
 
@@ -496,7 +495,6 @@ class _TerminalView extends LeafRenderObjectWidget {
       terminal: terminal,
       controller: controller,
       offset: offset,
-      padding: padding,
       autoResize: autoResize,
       textStyle: textStyle,
       textScaler: textScaler,
@@ -515,7 +513,6 @@ class _TerminalView extends LeafRenderObjectWidget {
       ..terminal = terminal
       ..controller = controller
       ..offset = offset
-      ..padding = padding
       ..autoResize = autoResize
       ..textStyle = textStyle
       ..textScaler = textScaler

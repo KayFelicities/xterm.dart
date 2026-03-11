@@ -118,6 +118,7 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
       _dropChild(i);
     }
     _startIndex = 0;
+    _absoluteStartIndex = 0;
     _length = 0;
   }
 
@@ -154,6 +155,14 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
     _dropChild(_length - 1);
     _length--;
     return result!;
+  }
+
+  /// take element at index from the list, but not detach it
+  T? take(int index) {
+    int i =_getCyclicIndex(index);
+    T? data = _array[i];
+    _array[i] = null;
+    return data;
   }
 
   /// Deletes [count] elements starting at [index], shifting all elements after
@@ -225,6 +234,7 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
   void trimStart(int count) {
     if (count > _length) count = _length;
     _startIndex += count;
+    _absoluteStartIndex += count;
     _startIndex %= _array.length;
     _length -= count;
   }
@@ -244,12 +254,13 @@ class IndexAwareCircularBuffer<T extends IndexedItem> {
       _dropChild(i);
     }
 
+    _startIndex = 0;
+
     final copyLength = replacement.length - copyStart;
     for (var i = 0; i < copyLength; i++) {
       _adoptChild(i, replacement[copyStart + i]);
     }
 
-    _startIndex = 0;
     _length = copyLength;
   }
 
